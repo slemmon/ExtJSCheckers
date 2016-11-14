@@ -159,6 +159,9 @@ Ext.define('Checkers.view.board.BoardController',{
                     activePiece.activate(false);
                 }
                 vmParent.set(activeType + 'Moves', vmParent.get(activeType + 'Moves') + 1);
+                if ((sprite.position.y === 0 && activePiece.type === 'clear' || sprite.position.y === 7 && activePiece.type === 'dark') && !activePiece.isKing) {
+                    activePiece.setKing();
+                }
             }
         }
     },
@@ -169,7 +172,7 @@ Ext.define('Checkers.view.board.BoardController',{
             position = piece.tile.position, 
             jumpPiece, tile, i;
         
-        if (!piece.isKing) {
+        
             for (i = 0; i < directions.length; i++) {
                 if ((tile = this.getTileAt(position.x + (1 * directions[i]), position.y + (1 * vDirection))) && tile.getStatus() !== 'free') {
                     jumpPiece = tile.getPiece();
@@ -177,6 +180,16 @@ Ext.define('Checkers.view.board.BoardController',{
                         continue;
                     }
                     if ((tile = this.getTileAt(position.x + (2 * directions[i]), position.y + (2 * vDirection))) && tile.getStatus() == 'free') {
+                        return true;
+                    }
+                }
+            if (piece.isKing) {
+                if ((tile = this.getTileAt(position.x + (1 * directions[i]), position.y + (-1 * vDirection))) && tile.getStatus() !== 'free') {
+                    jumpPiece = tile.getPiece();
+                    if (jumpPiece.type === piece.type) {
+                        continue;
+                    }
+                    if ((tile = this.getTileAt(position.x + (2 * directions[i]), position.y + (-2 * vDirection))) && tile.getStatus() == 'free') {
                         return true;
                     }
                 }
@@ -287,9 +300,9 @@ Ext.define('Checkers.view.board.BoardController',{
             pieceInBetween;
 
         // Moving a single step forward
-        if ((xDelta === 1 || xDelta === -1) && yDelta === (1 * direction)) {
+        if ((xDelta === 1 || xDelta === -1) && (yDelta === (1 * direction) || piece.isKing && yDelta === (-1 * direction))) {
             return true;
-        } else if (Math.abs(xDelta) === 2 && yDelta === (2 * direction)) {
+        } else if (Math.abs(xDelta) === 2 && (yDelta === (2 * direction) || piece.isKing && yDelta === (-2 * direction))) {
             pieceInBetween = this.getPieceAt(piecePosition.x - (xDelta/2), piecePosition.y - (yDelta/2));
             if (pieceInBetween && pieceInBetween.type !== piece.type) {
                 piece.pieceInBetween = pieceInBetween;

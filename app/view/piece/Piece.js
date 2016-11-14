@@ -39,7 +39,7 @@ Ext.define('Checkers.view.piece.Piece',{
                },
                stops: [{
                    offset: 0,
-                   color: enable ? '#fd6b1b' : '#CECECE'
+                   color: enable ? '#fd6b1b' : me.isKing ? '#000' : '#CECECE'
                }, {
                    offset: 1,
                    color: me.fillStyle
@@ -48,5 +48,36 @@ Ext.define('Checkers.view.piece.Piece',{
         });
 
         this.getSurface().renderFrame();
+    },
+    setKing: function () {
+      var me = this;
+
+      me.isKing = true;
+
+      me.setAttributes({
+            fillStyle: {
+               type: 'radial',
+               start: {
+                   x: 0,
+                   y: 0,
+                   r: 0
+               },
+               end: {
+                   x: 0,
+                   y: 0,
+                   r: 1
+               },
+               stops: [{
+                   offset: 0,
+                   color: '#000'
+               }, {
+                   offset: 1,
+                   color: me.fillStyle
+               }]
+            }
+        });
+
+        this.getSurface().renderFrame();
+
     }
 });
