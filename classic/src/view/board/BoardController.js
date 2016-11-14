@@ -255,8 +255,8 @@ Ext.define('Checkers.view.board.BoardController',{
         piece.tile.setPiece(null);
 
         piece.setAnimation({
-            duration: 500,
-            easing: 'ease'
+            duration: 300,
+            easing: 'easeOut'
         });
 
         Ext.defer(function() {
