@@ -46,7 +46,7 @@ Ext.define('Checkers.view.board.BoardController',{
             type: dark ? 'dark' : 'clear',
             status: dark ? 'free' : null,
             zIndex: dark ? 1 : 0,
-            fillStyle: dark ? '#000' : '#FFF'
+            fillStyle: dark ? '#212121' : '#FFF'
         });
     },
 
@@ -64,7 +64,6 @@ Ext.define('Checkers.view.board.BoardController',{
                     type: type,
                     r: 40,
                     zIndex: 2,
-                    fillStyle: i < 12 ? '#a00618' : '#e0d195',
                     listeners: {
                         beforedestroy : this.beforePieceDestroy,
                         scope: this
@@ -86,37 +85,17 @@ Ext.define('Checkers.view.board.BoardController',{
         this.actionForEachTile(function(tile, counter) {
             me.renderPiece(pieces[counter], tile);
         }, true, true);
+
     },
 
     renderPiece: function(piece, tile) {
-        var surface = this.getView().getSurface(),
-            color = piece.fillStyle;
+        var surface = this.getView().getSurface();
 
         piece.setAttributes({
             r: 40,
             cx: tile.x + 48,
             cy: tile.y + 48,
-            zIndex: 2,
-            fillStyle: {
-               type: 'radial',
-               start: {
-                   x: 0,
-                   y: 0,
-                   r: 0
-               },
-               end: {
-                   x: 0,
-                   y: 0,
-                   r: 1
-               },
-               stops: [{
-                   offset: 0,
-                   color: '#CECECE'
-               }, {
-                   offset: 1,
-                   color: color
-               }]
-            }
+            zIndex: 2
         });
 
         tile.setPiece(piece);
@@ -279,10 +258,15 @@ Ext.define('Checkers.view.board.BoardController',{
             duration: 500,
             easing: 'ease'
         });
+
         Ext.defer(function() {
             piece.setAttributes({
                 cx: tile.x + 48,
                 cy: tile.y + 48
+            });
+
+            piece.setAnimation({
+                duration: 0
             });
         }, 20);
 
