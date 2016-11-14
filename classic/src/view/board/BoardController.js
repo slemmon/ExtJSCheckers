@@ -134,9 +134,10 @@ Ext.define('Checkers.view.board.BoardController',{
             checkForAdditionalMoves;
 
         if (isPiece) {
-            if (sprite.type !== vmParent.get('turn')) {
+            if (sprite.type !== vmParent.get('turn') || !this.validPieceSelection(sprite)) {
                 return;
             }
+            
             if (sprite.status === 'rest') {
                 if (!vm.get('playerMove')) {
                     vm.set('playerMove', 1);
@@ -183,6 +184,39 @@ Ext.define('Checkers.view.board.BoardController',{
         }
 
         return false;
+    },
+
+    checkForPossibleJumps: function(type) {
+        var me = this,
+            vm = this.getViewModel(),
+            selectablePieces;
+
+        vm.set('selectablePieces', []);
+
+        selectablePieces = vm.get('selectablePieces');
+
+        me.actionForEachTile(function(tile) {
+            if (tile.piece && tile.piece.type === type) {
+                if (me.pieceHasAdditionalMoves(tile.piece)) {
+                    selectablePieces.push(tile.piece);
+                }
+            }
+        }, true);
+    },
+
+    validPieceSelection: function (piece) {
+        var vm = this.getViewModel(),
+            selectablePieces;
+
+        this.checkForPossibleJumps(piece.type);
+
+        selectablePieces = vm.get('selectablePieces');
+            if (selectablePieces.length) {
+                if (Ext.Array.indexOf(selectablePieces, piece) == -1) {
+                    return false;
+                }
+            }
+            return true;
     },
 
     onSpriteMouseOver: function (item, event) {

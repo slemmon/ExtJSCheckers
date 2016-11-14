@@ -4,6 +4,7 @@ Ext.define('Checkers.view.board.BoardViewModel',{
 
     data: {
         tileMap: [],
+        selectablePieces: [],
         playerMove: 0,
         types: ['dark', 'clear'],
         theme : 'standard'
