@@ -10,10 +10,6 @@ Ext.define('Checkers.view.board.BoardController',{
         this.renderPieces(['dark', 'clear']);
     },
 
-    clearTile: function (tile) {
-        tile.setPiece(null);
-    },
-
     renderTiles: function(surface, tilesPerRow, totalHeight, totalWidth) {
         var vm = this.getViewModel(),
             tileMap = vm.get('tileMap'),
@@ -134,7 +130,8 @@ Ext.define('Checkers.view.board.BoardController',{
             sprite = item.sprite,
             isPiece = sprite.tile,
             activePiece = vm.get('activePiece'),
-            activeType = activePiece && activePiece.type;
+            activeType = activePiece && activePiece.type,
+            checkForAdditionalMoves;
 
         if (isPiece) {
             if (sprite.type !== vmParent.get('turn')) {
@@ -153,16 +150,39 @@ Ext.define('Checkers.view.board.BoardController',{
             }
         } else {
             if (sprite.status === 'highlighted') {
+                checkForAdditionalMoves = !!activePiece.pieceInBetween;
                 this.movePieceToTile(activePiece, sprite);
-                if (this.pieceHasAdditionalMoves(activePiece)) {
-                    // TODO: allow additional moves
-                } else {
+                if (!(checkForAdditionalMoves && this.pieceHasAdditionalMoves(activePiece))) {
                     vm.set('playerMove', 0);
-                    vmParent.set(activeType + 'Moves', vmParent.get(activeType + 'Moves') + 1);
                     vmParent.set('turn', activeType === 'clear' ? 'dark' : 'clear');
+                    activePiece.activate(false);
+                }
+                vmParent.set(activeType + 'Moves', vmParent.get(activeType + 'Moves') + 1);
+            }
+        }
+    },
+
+    pieceHasAdditionalMoves: function (piece) {
+        var directions = [1, -1], 
+            vDirection = piece.type === 'dark' ? directions[0] : directions[1],
+            position = piece.tile.position, 
+            jumpPiece, tile, i;
+        
+        if (!piece.isKing) {
+            for (i = 0; i < directions.length; i++) {
+                if ((tile = this.getTileAt(position.x + (1 * directions[i]), position.y + (1 * vDirection))) && tile.getStatus() !== 'free') {
+                    jumpPiece = tile.getPiece();
+                    if (jumpPiece.type === piece.type) {
+                        continue;
+                    }
+                    if ((tile = this.getTileAt(position.x + (2 * directions[i]), position.y + (2 * vDirection))) && tile.getStatus() == 'free') {
+                        return true;
+                    }
                 }
             }
         }
+
+        return false;
     },
 
     onSpriteMouseOver: function (item, event) {
@@ -201,7 +221,7 @@ Ext.define('Checkers.view.board.BoardController',{
             matrix = new Ext.draw.Matrix();
 
         if (pieceInBetween) {
-            this.clearTile(pieceInBetween.tile);
+            pieceInBetween.tile.setPiece(null);
             pieceInBetween.destroy();
             piece.pieceInBetween = null;
         }
@@ -220,13 +240,8 @@ Ext.define('Checkers.view.board.BoardController',{
         }, 20);
 
         tile.setPiece(piece);
-        piece.activate(false);
         tile.highlight(false);
         matrix.destroy();
-    },
-
-    pieceHasAdditionalMoves: function (piece) {
-        return false;
     },
 
     validateMove: function(piece, tile) {

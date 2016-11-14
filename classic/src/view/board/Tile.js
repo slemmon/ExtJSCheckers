@@ -7,9 +7,11 @@ Ext.define('Checkers.view.board.Tile',{
     },
     status: null,
     piece: null,
+
     getPiece: function() {
         return this.piece;
     },
+
     setPiece: function (piece) {
         if (piece == null) {
             this.piece = null;
@@ -20,14 +22,17 @@ Ext.define('Checkers.view.board.Tile',{
             this.setStatus('filled');
         }
     },
+
     getStatus: function() {
         return this.status;
     },
+
     setStatus: function(status) {
         if (status && status !== this.status) {
             this.status = status;
         }
     },
+
     highlight: function(enable) {
         if (enable) {
             this.setStatus('highlighted');
@@ -39,6 +44,7 @@ Ext.define('Checkers.view.board.Tile',{
             lineWidth: 3,
             strokeStyle: enable ? '#5fa2dd' : 'none'
         });
+
         this.getSurface().renderFrame();
     }
 });

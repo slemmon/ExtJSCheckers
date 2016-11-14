@@ -5,6 +5,8 @@ Ext.define('Checkers.view.piece.Piece',{
     status: null,
     width: 96,
     height: 96,
+    isKing: false,
+    isFlyingKing : true,
     setTile: function (tile) {
         if (tile && tile != this.tile) {
             this.tile = tile;
